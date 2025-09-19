@@ -1,0 +1,17 @@
+<!-- templates/input.html -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Input Features</title>
+</head>
+<body>
+<h1>Input Sonar Features</h1>
+<p>Paste 60 comma-separated numeric feature values (one sample per prediction).</p>
+<form action="/predict" method="post">
+<textarea name="features" rows="8" cols="120">{{ sample }}</textarea><br>
+<button type="submit">Predict</button>
+</form>
+<p>If you have a CSV or multiple samples, you can adapt the backend to accept file uploads.</p>
+</body>
+</html>
