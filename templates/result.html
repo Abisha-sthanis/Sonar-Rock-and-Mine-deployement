@@ -1,0 +1,29 @@
+<!-- templates/result.html -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Result</title>
+</head>
+<body>
+<h1>Prediction Result</h1>
+{% if error %}
+<p style="color:red">Error: {{ error }}</p>
+{% else %}
+<p>Predicted label: <strong>{{ prediction }}</strong></p>
+<p>Human-readable: <strong>{{ human }}</strong></p>
+{% if prob_info %}
+<h3>Class probabilities</h3>
+<ul>
+{% for cls, p in prob_info.items() %}
+<li>{{ cls }} : {{ '%.4f'|format(p) }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endif %}
+
+
+<p>R is for Rock — M is for Mine.</p>
+<p><a href="/input">Make another prediction</a></p>
+</body>
+</html>
