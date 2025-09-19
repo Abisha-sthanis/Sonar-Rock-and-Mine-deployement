@@ -1,29 +1,554 @@
-<!-- templates/result.html -->
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <title>Result</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #667eea 50%, #764ba2 75%, #f093fb 100%);
+    background-size: 400% 400%;
+    animation: resultGradient 10s ease infinite;
+    min-height: 100vh;
+    padding: 20px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+@keyframes resultGradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 30px;
+    padding: 50px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    transform: scale(0.9) translateY(30px);
+    opacity: 0;
+    animation: containerAppear 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes containerAppear {
+    to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+h1 {
+    color: white;
+    text-align: center;
+    font-size: 3rem;
+    font-weight: 300;
+    letter-spacing: 4px;
+    margin-bottom: 30px;
+    position: relative;
+    animation: titleReveal 1.5s ease-out 0.3s forwards;
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+@keyframes titleReveal {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        text-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+    }
+}
+
+.result-card {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 30px;
+    margin: 30px 0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    animation: cardSlideIn 1s ease-out 0.6s forwards;
+    opacity: 0;
+    transform: translateX(-50px);
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes cardSlideIn {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.result-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: cardShimmer 3s ease-in-out infinite;
+}
+
+@keyframes cardShimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.error {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 500;
+    animation: errorPulse 2s ease-in-out infinite;
+}
+
+@keyframes errorPulse {
+    0%, 100% { 
+        box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+        transform: scale(1.02);
+    }
+}
+
+.prediction-result {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.prediction-result p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    animation: fadeInUp 1s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.prediction-result p:nth-child(1) { animation-delay: 0.9s; }
+.prediction-result p:nth-child(2) { animation-delay: 1.1s; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.prediction-label {
+    display: inline-block;
+    background: linear-gradient(45deg, #4facfe, #00f2fe);
+    color: white;
+    padding: 10px 25px;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    animation: labelGlow 2s ease-in-out infinite alternate;
+    margin: 0 10px;
+}
+
+@keyframes labelGlow {
+    from { 
+        box-shadow: 0 0 20px rgba(79, 172, 254, 0.5);
+        transform: scale(1);
+    }
+    to { 
+        box-shadow: 0 0 30px rgba(79, 172, 254, 0.8);
+        transform: scale(1.05);
+    }
+}
+
+.human-readable {
+    color: #a7f3d0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-shadow: 0 0 15px rgba(167, 243, 208, 0.5);
+    animation: readableGlow 3s ease-in-out infinite;
+}
+
+@keyframes readableGlow {
+    0%, 100% { text-shadow: 0 0 15px rgba(167, 243, 208, 0.5); }
+    50% { text-shadow: 0 0 25px rgba(167, 243, 208, 0.8); }
+}
+
+.probabilities {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 25px 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: probSlideIn 1s ease-out 1.3s forwards;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+@keyframes probSlideIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.probabilities h3 {
+    color: white;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    font-weight: 400;
+    letter-spacing: 1px;
+}
+
+.probabilities ul {
+    list-style: none;
+    display: grid;
+    gap: 15px;
+}
+
+.probabilities li {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 15px 20px;
+    border-radius: 12px;
+    color: white;
+    font-size: 1.1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    animation: listItemAppear 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateX(-20px);
+}
+
+.probabilities li:nth-child(1) { animation-delay: 1.5s; }
+.probabilities li:nth-child(2) { animation-delay: 1.7s; }
+
+@keyframes listItemAppear {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.probabilities li:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(10px);
+    box-shadow: 0 5px 20px rgba(255, 255, 255, 0.1);
+}
+
+.class-name {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.probability-value {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+}
+
+.info-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 30px 0;
+    text-align: center;
+    border-left: 4px solid rgba(167, 243, 208, 0.6);
+    animation: infoFadeIn 1s ease-out 1.9s forwards;
+    opacity: 0;
+}
+
+@keyframes infoFadeIn {
+    to { opacity: 1; }
+}
+
+.info-section p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    font-weight: 500;
+    animation: legendSlide 1s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.legend-item:nth-child(1) { animation-delay: 2.1s; }
+.legend-item:nth-child(2) { animation-delay: 2.3s; }
+
+@keyframes legendSlide {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.legend-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    animation: iconPulse 2s ease-in-out infinite;
+}
+
+.rock-icon { background: linear-gradient(45deg, #8B4513, #D2691E); }
+.mine-icon { background: linear-gradient(45deg, #FF4500, #FF6347); }
+
+@keyframes iconPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.action-button {
+    display: inline-block;
+    padding: 15px 35px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    animation: buttonAppear 1s ease-out 2.5s forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes buttonAppear {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.action-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.action-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(45deg, #5a67d8, #6b46c1);
+}
+
+.action-button:hover::before {
+    left: 100%;
+}
+
+.floating-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.floating-shape {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    animation: floatUp 20s infinite linear;
+}
+
+.floating-shape:nth-child(1) {
+    width: 60px;
+    height: 60px;
+    left: 15%;
+    animation-delay: -3s;
+}
+
+.floating-shape:nth-child(2) {
+    width: 80px;
+    height: 80px;
+    left: 85%;
+    animation-delay: -10s;
+    animation-duration: 25s;
+}
+
+.floating-shape:nth-child(3) {
+    width: 40px;
+    height: 40px;
+    left: 50%;
+    animation-delay: -15s;
+    animation-duration: 18s;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+    }
+    10% { opacity: 0.3; }
+    90% { opacity: 0.3; }
+    100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        margin: 10px;
+        padding: 30px 20px;
+    }
+    
+    h1 {
+        font-size: 2.2rem;
+        letter-spacing: 2px;
+    }
+    
+    .legend {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .prediction-label {
+        font-size: 1.2rem;
+        padding: 8px 20px;
+    }
+    
+    .probabilities ul {
+        gap: 10px;
+    }
+}
+
+.success-indicator {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: successPulse 2s ease-in-out infinite;
+}
+
+.success-indicator::after {
+    content: '✓';
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+@keyframes successPulse {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+    }
+    50% { 
+        transform: scale(1.1);
+        box-shadow: 0 0 30px rgba(76, 175, 80, 0.6);
+    }
+}
+</style>
 </head>
 <body>
-<h1>Prediction Result</h1>
-{% if error %}
-<p style="color:red">Error: {{ error }}</p>
-{% else %}
-<p>Predicted label: <strong>{{ prediction }}</strong></p>
-<p>Human-readable: <strong>{{ human }}</strong></p>
-{% if prob_info %}
-<h3>Class probabilities</h3>
-<ul>
-{% for cls, p in prob_info.items() %}
-<li>{{ cls }} : {{ '%.4f'|format(p) }}</li>
-{% endfor %}
-</ul>
-{% endif %}
-{% endif %}
+<div class="floating-elements">
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+</div>
 
+<div class="success-indicator"></div>
 
-<p>R is for Rock — M is for Mine.</p>
-<p><a href="/input">Make another prediction</a></p>
+<div class="container">
+    <h1>Prediction Result</h1>
+    
+    {% if error %}
+    <div class="result-card">
+        <div class="error">Error: {{ error }}</div>
+    </div>
+    {% else %}
+    <div class="result-card">
+        <div class="prediction-result">
+            <p>Predicted label: <span class="prediction-label">{{ prediction }}</span></p>
+            <p>Human-readable: <span class="human-readable">{{ human }}</span></p>
+        </div>
+        
+        {% if prob_info %}
+        <div class="probabilities">
+            <h3>Class Probabilities</h3>
+            <ul>
+            {% for cls, p in prob_info.items() %}
+                <li>
+                    <span class="class-name">{{ cls }}</span>
+                    <span class="probability-value">{{ '%.4f'|format(p) }}</span>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="info-section">
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-icon rock-icon"></div>
+                <span>R is for Rock</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon mine-icon"></div>
+                <span>M is for Mine</span>
+            </div>
+        </div>
+        
+        <p style="text-align: center; margin-top: 30px;">
+            <a href="/input" class="action-button">Make Another Prediction</a>
+        </p>
+    </div>
+</div>
 </body>
 </html>
