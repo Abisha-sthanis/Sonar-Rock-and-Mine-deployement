@@ -1,10 +1,10 @@
 # Use Python 3.13 base image
 FROM python:3.13-slim
 
-# Set environment variables
+# Environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV PORT=5000  # default for local runs
+ENV PORT=5000
 
 # Set work directory
 WORKDIR /app
@@ -26,5 +26,5 @@ COPY . .
 # Expose port
 EXPOSE 5000
 
-# Use shell form so env vars expand properly
+# Run with Gunicorn (Flask app in app.py -> variable `app`)
 CMD gunicorn -b 0.0.0.0:$PORT app:app
