@@ -1,7 +1,7 @@
 # Use Python 3.13 base image
 FROM python:3.13-slim
 
-# Set environment vars (no .pyc, UTF-8)
+# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
@@ -29,31 +29,3 @@ EXPOSE 5000
 # -b 0.0.0.0:$PORT lets Render bind dynamically
 # app:app → points to Flask object inside app.py
 CMD ["gunicorn", "-b", "0.0.0.0:${PORT}", "app:app"]
-📄 requirements.txt
-Make sure your requirements.txt has at least:
-
-nginx
-Copy code
-Flask
-scikit-learn
-pandas
-numpy
-gunicorn
-⚙️ Render Deployment Steps
-Push your project (with Dockerfile) to GitHub/GitLab.
-
-In Render:
-
-Create a new Web Service.
-
-Choose Docker as deployment method.
-
-Point to your repo.
-
-Render automatically builds with Dockerfile.
-
-The CMD in Dockerfile runs Gunicorn:
-
-nginx
-Copy code
-gunicorn -b 0.0.0.0:$PORT app:app
