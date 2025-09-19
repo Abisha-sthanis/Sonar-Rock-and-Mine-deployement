@@ -1,17 +1,437 @@
-<!-- templates/input.html -->
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <title>Input Features</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+    background-size: 400% 400%;
+    animation: gradientFlow 12s ease infinite;
+    min-height: 100vh;
+    padding: 20px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+@keyframes gradientFlow {
+    0%, 100% { background-position: 0% 50%; }
+    25% { background-position: 100% 0%; }
+    50% { background-position: 100% 100%; }
+    75% { background-position: 0% 100%; }
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 25px;
+    padding: 40px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(30px);
+    opacity: 0;
+    animation: containerSlideIn 1.2s ease-out forwards;
+    position: relative;
+}
+
+@keyframes containerSlideIn {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+    border-radius: 25px;
+    opacity: 0;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { opacity: 0; transform: translateX(-100%); }
+    50% { opacity: 1; transform: translateX(100%); }
+}
+
+h1 {
+    color: white;
+    text-align: center;
+    font-size: 2.8rem;
+    font-weight: 300;
+    letter-spacing: 3px;
+    margin-bottom: 15px;
+    position: relative;
+    animation: titlePulse 2.5s ease-in-out infinite;
+}
+
+@keyframes titlePulse {
+    0%, 100% { 
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+        transform: scale(1);
+    }
+    50% { 
+        text-shadow: 0 0 30px rgba(255, 255, 255, 0.9), 0 0 40px rgba(102, 126, 234, 0.4);
+        transform: scale(1.02);
+    }
+}
+
+.subtitle {
+    color: rgba(255, 255, 255, 0.85);
+    text-align: center;
+    margin-bottom: 35px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    animation: fadeInUp 1.5s ease-out 0.3s forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+form {
+    position: relative;
+    animation: formSlideIn 1.2s ease-out 0.6s forwards;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+@keyframes formSlideIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.textarea-container {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.textarea-container::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+    border-radius: 15px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.textarea-container:hover::before,
+.textarea-container:focus-within::before {
+    opacity: 1;
+}
+
+textarea {
+    width: 100%;
+    padding: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: white;
+    font-size: 0.95rem;
+    font-family: 'Courier New', monospace;
+    line-height: 1.5;
+    resize: vertical;
+    min-height: 200px;
+    outline: none;
+    transition: all 0.4s ease;
+    position: relative;
+    z-index: 1;
+}
+
+textarea::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+}
+
+textarea:focus {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.15);
+    transform: scale(1.01);
+    box-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.2),
+        inset 0 1px 3px rgba(255, 255, 255, 0.1);
+}
+
+.button-container {
+    text-align: center;
+    margin: 30px 0;
+    animation: buttonFadeIn 1s ease-out 0.9s forwards;
+    opacity: 0;
+}
+
+@keyframes buttonFadeIn {
+    to { opacity: 1; }
+}
+
+button {
+    padding: 16px 40px;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.6s ease;
+}
+
+button:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(45deg, #5a67d8, #6b46c1);
+}
+
+button:hover::before {
+    left: 100%;
+}
+
+button:active {
+    transform: translateY(-2px) scale(1.02);
+}
+
+.info-note {
+    color: rgba(255, 255, 255, 0.75);
+    text-align: center;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border-left: 4px solid rgba(102, 126, 234, 0.6);
+    animation: noteSlideIn 1s ease-out 1.2s forwards;
+    opacity: 0;
+    transform: translateX(-30px);
+}
+
+@keyframes noteSlideIn {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.floating-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.particle {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: particleFloat 15s infinite linear;
+}
+
+.particle:nth-child(1) {
+    width: 4px;
+    height: 4px;
+    left: 20%;
+    animation-delay: -2s;
+}
+
+.particle:nth-child(2) {
+    width: 6px;
+    height: 6px;
+    left: 80%;
+    animation-delay: -8s;
+    animation-duration: 18s;
+}
+
+.particle:nth-child(3) {
+    width: 3px;
+    height: 3px;
+    left: 60%;
+    animation-delay: -5s;
+    animation-duration: 12s;
+}
+
+.particle:nth-child(4) {
+    width: 5px;
+    height: 5px;
+    left: 10%;
+    animation-delay: -12s;
+    animation-duration: 20s;
+}
+
+.particle:nth-child(5) {
+    width: 4px;
+    height: 4px;
+    left: 90%;
+    animation-delay: -1s;
+    animation-duration: 16s;
+}
+
+@keyframes particleFloat {
+    0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.data-visualization {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    animation: rotate 10s linear infinite;
+}
+
+.data-visualization::before,
+.data-visualization::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.data-visualization::before {
+    top: 10px;
+    left: 10px;
+    animation-delay: -0.5s;
+}
+
+.data-visualization::after {
+    bottom: 10px;
+    right: 10px;
+    animation-delay: -1s;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    50% { 
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        margin: 10px;
+        padding: 25px;
+    }
+    
+    h1 {
+        font-size: 2.2rem;
+        letter-spacing: 1px;
+    }
+    
+    textarea {
+        font-size: 0.9rem;
+        padding: 15px;
+        min-height: 150px;
+    }
+    
+    button {
+        padding: 14px 30px;
+        font-size: 1rem;
+    }
+    
+    .data-visualization {
+        display: none;
+    }
+}
+</style>
 </head>
 <body>
-<h1>Input Sonar Features</h1>
-<p>Paste 60 comma-separated numeric feature values (one sample per prediction).</p>
-<form action="/predict" method="post">
-<textarea name="features" rows="8" cols="120">{{ sample }}</textarea><br>
-<button type="submit">Predict</button>
-</form>
-<p>If you have a CSV or multiple samples, you can adapt the backend to accept file uploads.</p>
+<div class="floating-particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+</div>
+
+<div class="data-visualization"></div>
+
+<div class="container">
+    <h1>Input Sonar Features</h1>
+    <p class="subtitle">Paste 60 comma-separated numeric feature values (one sample per prediction).</p>
+    
+    <form action="/predict" method="post">
+        <div class="textarea-container">
+            <textarea name="features" rows="8" placeholder="Enter your comma-separated numeric values here...&#10;Example: 0.0453, 0.0523, 0.0843, 0.0689, 0.1183, 0.2583, 0.2156, 0.3481...">{{ sample }}</textarea>
+        </div>
+        
+        <div class="button-container">
+            <button type="submit">Predict</button>
+        </div>
+    </form>
+    
+    <div class="info-note">
+        <p>If you have a CSV or multiple samples, you can adapt the backend to accept file uploads.</p>
+    </div>
+</div>
 </body>
 </html>
